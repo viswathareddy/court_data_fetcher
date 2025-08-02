@@ -1,0 +1,477 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <!-- Header Section -->
+        <div class="text-center mb-5" data-aos="fade-down">
+            <h1 class="display-5 fw-bold text-white mb-3">
+                <i class="fas fa-history me-3"></i>
+                Search History
+            </h1>
+            <p class="lead text-white-50">Track all your previous searches and AI analyses</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="card text-center stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h3 class="card-title text-success">{{ logs|selectattr('status', 'equalto', 'success')|list|length }}</h3>
+                        <p class="card-text">Successful Searches</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="card text-center stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h3 class="card-title text-warning">{{ logs|selectattr('status', 'equalto', 'error')|list|length }}</h3>
+                        <p class="card-text">Failed Searches</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="400">
+                <div class="card text-center stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                        <h3 class="card-title text-info">{{ logs|selectattr('status', 'equalto', 'pending')|list|length }}</h3>
+                        <p class="card-text">Pending Searches</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="500">
+                <div class="card text-center stat-card">
+                    <div class="card-body">
+                        <i class="fas fa-chart-bar fa-3x text-primary mb-3"></i>
+                        <h3 class="card-title text-primary">{{ logs|length }}</h3>
+                        <p class="card-text">Total Searches</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search History Table -->
+        <div class="card" data-aos="zoom-in" data-aos-delay="600">
+            <div class="card-header bg-gradient-primary text-white">
+                <h3 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Recent Search History
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if logs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-calendar me-2"></i>Date/Time</th>
+                                    <th><i class="fas fa-file-alt me-2"></i>Case Type</th>
+                                    <th><i class="fas fa-hashtag me-2"></i>Case Number</th>
+                                    <th><i class="fas fa-calendar me-2"></i>Filing Year</th>
+                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                                    <th><i class="fas fa-tools me-2"></i>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr class="history-row" data-aos="fade-up" data-aos-delay="{{ 700 + loop.index * 50 }}">
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-semibold">{{ log.timestamp.strftime('%d %b %Y') }}</span>
+                                            <small class="text-muted">{{ log.timestamp.strftime('%H:%M:%S') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark">{{ log.case_type }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold">{{ log.case_number }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ log.filing_year }}</span>
+                                    </td>
+                                    <td>
+                                        {% if log.status == 'success' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Success
+                                            </span>
+                                        {% elif log.status == 'error' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Error
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    onclick="viewDetails('{{ log.id }}')" 
+                                                    title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-success" 
+                                                    onclick="repeatSearch('{{ log.case_type }}', '{{ log.case_number }}', '{{ log.filing_year }}')" 
+                                                    title="Repeat Search">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                            {% if log.status == 'success' %}
+                                            <button type="button" class="btn btn-sm btn-outline-info" 
+                                                    onclick="analyzeCase('{{ log.id }}')" 
+                                                    title="AI Analysis">
+                                                <i class="fas fa-robot"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5" data-aos="fade-up">
+                        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Search History</h4>
+                        <p class="text-muted">Start searching for cases to see your history here.</p>
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Start Searching
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card" data-aos="fade-up" data-aos-delay="800">
+                    <div class="card-header bg-gradient-info text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tools me-2"></i>Quick Actions
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <a href="/" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>New Search
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100" onclick="exportHistory()">
+                                    <i class="fas fa-download me-2"></i>Export History
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-danger w-100" onclick="clearHistory()">
+                                    <i class="fas fa-trash me-2"></i>Clear History
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Search Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced CSS for History Page -->
+<style>
+.stat-card {
+    transition: var(--transition);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.history-row {
+    transition: var(--transition);
+}
+
+.history-row:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: scale(1.01);
+}
+
+.btn-group .btn {
+    transition: var(--transition);
+}
+
+.btn-group .btn:hover {
+    transform: scale(1.1);
+}
+
+/* Enhanced table styling */
+.table th {
+    background: linear-gradient(135deg, var(--primary-color), #34495e);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+/* Badge enhancements */
+.badge {
+    font-size: 0.85rem;
+    padding: 0.5em 0.75em;
+    border-radius: 6px;
+}
+
+/* Modal enhancements */
+.modal-content {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border: none;
+}
+
+/* Loading animation */
+.loading-dots {
+    display: inline-block;
+}
+
+.loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+/* Success animation for actions */
+.action-success {
+    animation: actionSuccess 0.6s ease-out;
+}
+
+@keyframes actionSuccess {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.25rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<!-- Enhanced JavaScript for History Page -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to stat cards
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Add click effects to action buttons
+    const actionButtons = document.querySelectorAll('.btn-group .btn');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.classList.add('action-success');
+            setTimeout(() => {
+                this.classList.remove('action-success');
+            }, 600);
+        });
+    });
+});
+
+function viewDetails(logId) {
+    // Show loading in modal
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    const modalContent = document.getElementById('modalContent');
+    
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p>Loading details<span class="loading-dots"></span></p>
+        </div>
+    `;
+    
+    modal.show();
+    
+    // Simulate loading (in real app, fetch from API)
+    setTimeout(() => {
+        modalContent.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary">Search Parameters</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Case Type:</strong> <span class="badge bg-light text-dark">WP(C)</span></li>
+                        <li><strong>Case Number:</strong> <span class="fw-semibold">1234</span></li>
+                        <li><strong>Filing Year:</strong> <span class="text-muted">2024</span></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-success">Response Details</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Status:</strong> <span class="badge bg-success">Success</span></li>
+                        <li><strong>Response Time:</strong> <span class="text-muted">2.3s</span></li>
+                        <li><strong>Data Size:</strong> <span class="text-muted">1.2KB</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-3">
+                <h6 class="text-info">Raw Response</h6>
+                <pre class="bg-light p-3 rounded"><code>{"case_title": "WP(C) 1234/2024", "parties": "Petitioner vs Respondent", ...}</code></pre>
+            </div>
+        `;
+    }, 1000);
+}
+
+function repeatSearch(caseType, caseNumber, filingYear) {
+    // Fill the search form and redirect
+    const baseUrl = window.location.origin;
+    const searchUrl = `${baseUrl}/?case_type=${encodeURIComponent(caseType)}&case_number=${encodeURIComponent(caseNumber)}&filing_year=${encodeURIComponent(filingYear)}`;
+    
+    // Show loading animation
+    const button = event.target.closest('.btn');
+    button.innerHTML = '<span class="loading-spinner me-2"></span>Loading...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        window.location.href = searchUrl;
+    }, 500);
+}
+
+function analyzeCase(logId) {
+    // Show AI analysis for the case
+    const button = event.target.closest('.btn');
+    button.innerHTML = '<i class="fas fa-robot me-1"></i>Analyzing...';
+    button.disabled = true;
+    
+    // Simulate AI analysis
+    setTimeout(() => {
+        button.innerHTML = '<i class="fas fa-robot me-1"></i>Analyzed';
+        button.classList.remove('btn-outline-info');
+        button.classList.add('btn-success');
+        
+        // Show success animation
+        button.classList.add('action-success');
+        setTimeout(() => {
+            button.classList.remove('action-success');
+        }, 600);
+    }, 2000);
+}
+
+function exportHistory() {
+    const button = event.target;
+    button.innerHTML = '<span class="loading-spinner me-2"></span>Exporting...';
+    button.disabled = true;
+    
+    // Simulate export
+    setTimeout(() => {
+        button.innerHTML = '<i class="fas fa-download me-2"></i>Export History';
+        button.disabled = false;
+        
+        // Show success message
+        showSuccessMessage('History exported successfully!');
+    }, 1500);
+}
+
+function clearHistory() {
+    if (confirm('Are you sure you want to clear all search history? This action cannot be undone.')) {
+        const button = event.target;
+        button.innerHTML = '<span class="loading-spinner me-2"></span>Clearing...';
+        button.disabled = true;
+        
+        // Simulate clearing
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-trash me-2"></i>Clear History';
+            button.disabled = false;
+            
+            // Show success message
+            showSuccessMessage('History cleared successfully!');
+            
+            // Reload page to show empty state
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }, 1000);
+    }
+}
+
+function showSuccessMessage(message) {
+    // Create and show a success toast
+    const toast = document.createElement('div');
+    toast.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <!-- Hero Section -->
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h1 class="display-4 fw-bold text-white mb-3">
+                <i class="fas fa-gavel me-3"></i>
+                Court Data Fetcher
+            </h1>
+            <p class="lead text-white-50 mb-4">
+                Search Delhi High Court cases with AI-powered analysis and insights
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <span class="badge bg-primary fs-6">
+                    <i class="fas fa-search me-1"></i>Smart Search
+                </span>
+                <span class="badge bg-success fs-6">
+                    <i class="fas fa-robot me-1"></i>AI Analysis
+                </span>
+                <span class="badge bg-info fs-6">
+                    <i class="fas fa-file-pdf me-1"></i>PDF Download
+                </span>
+            </div>
+        </div>
+
+        <!-- Search Form Card -->
+        <div class="card animate-on-scroll" data-aos="zoom-in" data-aos-delay="200">
+            <div class="card-header bg-gradient-primary text-white text-center">
+                <h3 class="mb-0">
+                    <i class="fas fa-search me-2"></i>Search Case Details
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="searchForm">
+                    <div class="row g-3">
+                        <!-- Case Type -->
+                        <div class="col-md-4" data-aos="fade-right" data-aos-delay="300">
+                            <label for="case_type" class="form-label">
+                                <i class="fas fa-file-alt me-2"></i>Case Type
+                            </label>
+                            <select class="form-select" id="case_type" name="case_type" required>
+                                <option value="">Select Case Type</option>
+                                <option value="WP(C)">WP(C) - Writ Petition (Civil)</option>
+                                <option value="CRL.A">CRL.A - Criminal Appeal</option>
+                                <option value="CIVIL">CIVIL - Civil Suit</option>
+                                <option value="CRL.M.C">CRL.M.C - Criminal Miscellaneous</option>
+                                <option value="LPA">LPA - Letters Patent Appeal</option>
+                                <option value="FAO">FAO - First Appeal from Order</option>
+                                <option value="RFA">RFA - Regular First Appeal</option>
+                            </select>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Choose the type of case you're searching for
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Case Number -->
+                        <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+                            <label for="case_number" class="form-label">
+                                <i class="fas fa-hashtag me-2"></i>Case Number
+                            </label>
+                            <input type="text" class="form-control" id="case_number" name="case_number" 
+                                   placeholder="e.g., 1234" required>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Enter the numeric case number
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Filing Year -->
+                        <div class="col-md-4" data-aos="fade-left" data-aos-delay="500">
+                            <label for="filing_year" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>Filing Year
+                            </label>
+                            <input type="text" class="form-control" id="filing_year" name="filing_year" 
+                                   placeholder="e.g., 2024" required>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Enter the 4-digit filing year
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="600">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-search me-2"></i>Fetch Case Details
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5 g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="700">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-robot fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">AI Analysis</h5>
+                        <p class="card-text">
+                            Get intelligent insights about case type, timeline, legal implications, and recommendations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="800">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-file-pdf fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">PDF Downloads</h5>
+                        <p class="card-text">
+                            Download court orders and judgments directly from the application with one click.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="900">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-history fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Search History</h5>
+                        <p class="card-text">
+                            Track all your previous searches with detailed logging and statistics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Cases Section -->
+        <div class="card mt-5" data-aos="fade-up" data-aos-delay="1000">
+            <div class="card-header bg-gradient-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>Try Demo Cases
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Test the application with these sample cases to see AI analysis in action:
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="demo-case-card" onclick="fillDemoCase('WP(C)', '1234', '2024')">
+                            <div class="card h-100 demo-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-gavel fa-2x text-primary mb-2"></i>
+                                    <h6 class="card-title">WP(C) 1234/2024</h6>
+                                    <small class="text-muted">Writ Petition Civil</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="demo-case-card" onclick="fillDemoCase('CRL.A', '5678', '2023')">
+                            <div class="card h-100 demo-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-balance-scale fa-2x text-warning mb-2"></i>
+                                    <h6 class="card-title">CRL.A 5678/2023</h6>
+                                    <small class="text-muted">Criminal Appeal</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="demo-case-card" onclick="fillDemoCase('CIVIL', '9999', '2022')">
+                            <div class="card h-100 demo-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-briefcase fa-2x text-success mb-2"></i>
+                                    <h6 class="card-title">CIVIL 9999/2022</h6>
+                                    <small class="text-muted">Civil Suit</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="demo-case-card" onclick="fillDemoCase('CRL.M.C', '4321', '2021')">
+                            <div class="card h-100 demo-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                                    <h6 class="card-title">CRL.M.C 4321/2021</h6>
+                                    <small class="text-muted">Criminal Miscellaneous</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="card mt-5" data-aos="fade-up" data-aos-delay="1100">
+            <div class="card-header bg-gradient-warning text-dark">
+                <h4 class="mb-0">
+                    <i class="fas fa-question-circle me-2"></i>How to Search
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success me-2"></i>Valid Inputs:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-arrow-right text-primary me-2"></i>Case Type: Letters and parentheses only</li>
+                            <li><i class="fas fa-arrow-right text-primary me-2"></i>Case Number: Numeric values only</li>
+                            <li><i class="fas fa-arrow-right text-primary me-2"></i>Filing Year: 4-digit year (e.g., 2024)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Examples:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-arrow-right text-primary me-2"></i>WP(C) 1234 2024</li>
+                            <li><i class="fas fa-arrow-right text-primary me-2"></i>CRL.A 5678 2023</li>
+                            <li><i class="fas fa-arrow-right text-primary me-2"></i>CIVIL 9999 2022</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for Demo Cards -->
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--secondary-color), #2980b9) !important;
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, var(--info-color), #138496) !important;
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, var(--warning-color), #e67e22) !important;
+}
+
+.demo-case-card {
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.demo-case-card:hover {
+    transform: translateY(-5px);
+}
+
+.demo-card {
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.demo-card:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+
+/* Enhanced form styling */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+    transform: scale(1.02);
+}
+
+/* Loading state for form */
+.form-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Success state animation */
+.form-success {
+    animation: successGlow 0.6s ease-out;
+}
+
+@keyframes successGlow {
+    0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+}
+</style>
+
+<!-- Enhanced JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation with animations
+    const form = document.getElementById('searchForm');
+    const inputs = form.querySelectorAll('input, select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+    });
+    
+    // Form submission with loading animation
+    form.addEventListener('submit', function(e) {
+        if (validateForm()) {
+            showLoadingState();
+        } else {
+            e.preventDefault();
+            showErrorAnimation();
+        }
+    });
+    
+    // Auto-focus first input
+    document.getElementById('case_type').focus();
+});
+
+function validateField(field) {
+    const value = field.value.trim();
+    const fieldName = field.name;
+    
+    // Remove previous validation classes
+    field.classList.remove('is-valid', 'is-invalid');
+    
+    if (!value) {
+        field.classList.add('is-invalid');
+        return false;
+    }
+    
+    // Specific validation rules
+    if (fieldName === 'case_number' && !/^\d+$/.test(value)) {
+        field.classList.add('is-invalid');
+        return false;
+    }
+    
+    if (fieldName === 'filing_year' && !/^\d{4}$/.test(value)) {
+        field.classList.add('is-invalid');
+        return false;
+    }
+    
+    field.classList.add('is-valid');
+    return true;
+}
+
+function validateForm() {
+    const inputs = document.querySelectorAll('#searchForm input, #searchForm select');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+        if (!validateField(input)) {
+            isValid = false;
+        }
+    });
+    
+    return isValid;
+}
+
+function showLoadingState() {
+    const form = document.getElementById('searchForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.classList.add('form-loading');
+    submitBtn.innerHTML = '<span class="loading-spinner me-2"></span>Searching...';
+    submitBtn.disabled = true;
+}
+
+function showErrorAnimation() {
+    const form = document.getElementById('searchForm');
+    form.classList.add('error-shake');
+    
+    setTimeout(() => {
+        form.classList.remove('error-shake');
+    }, 500);
+}
+
+function fillDemoCase(caseType, caseNumber, filingYear) {
+    // Add click animation
+    const clickedCard = event.currentTarget;
+    clickedCard.classList.add('bounce');
+    
+    setTimeout(() => {
+        clickedCard.classList.remove('bounce');
+    }, 600);
+    
+    // Fill the form
+    document.getElementById('case_type').value = caseType;
+    document.getElementById('case_number').value = caseNumber;
+    document.getElementById('filing_year').value = filingYear;
+    
+    // Add success animation
+    const form = document.getElementById('searchForm');
+    form.classList.add('form-success');
+    
+    setTimeout(() => {
+        form.classList.remove('form-success');
+    }, 600);
+    
+    // Scroll to form
+    document.getElementById('searchForm').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+    
+    // Auto-submit after a short delay
+    setTimeout(() => {
+        document.getElementById('searchForm').submit();
+    }, 1000);
+}
+
+// Add floating animation to demo cards
+document.addEventListener('DOMContentLoaded', function() {
+    const demoCards = document.querySelectorAll('.demo-card');
+    demoCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+});
+</script>
+{% endblock %}
+

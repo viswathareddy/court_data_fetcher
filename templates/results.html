@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        {% if result %}
+            <!-- Success Header -->
+            <div class="text-center mb-4" data-aos="fade-down">
+                <div class="success-animation-container">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <h2 class="text-white fw-bold">Case Details Found!</h2>
+                    <p class="text-white-50 lead">AI analysis and insights available below</p>
+                </div>
+            </div>
+
+            <!-- Main Case Details Card -->
+            <div class="card mb-4" data-aos="zoom-in" data-aos-delay="200">
+                <div class="card-header bg-gradient-success text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-gavel me-2"></i>Case Information
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <tbody>
+                                        <tr data-aos="fade-right" data-aos-delay="300">
+                                            <th width="30%" class="text-primary">
+                                                <i class="fas fa-file-alt me-2"></i>Case Title
+                                            </th>
+                                            <td class="fw-semibold">{{ result.case_title }}</td>
+                                        </tr>
+                                        <tr data-aos="fade-right" data-aos-delay="400">
+                                            <th class="text-primary">
+                                                <i class="fas fa-users me-2"></i>Parties
+                                            </th>
+                                            <td class="fw-semibold">{{ result.parties }}</td>
+                                        </tr>
+                                        <tr data-aos="fade-right" data-aos-delay="500">
+                                            <th class="text-primary">
+                                                <i class="fas fa-calendar-plus me-2"></i>Filing Date
+                                            </th>
+                                            <td class="fw-semibold">{{ result.filing_date }}</td>
+                                        </tr>
+                                        <tr data-aos="fade-right" data-aos-delay="600">
+                                            <th class="text-primary">
+                                                <i class="fas fa-calendar-check me-2"></i>Next Hearing
+                                            </th>
+                                            <td>
+                                                {% if result.next_hearing and result.next_hearing != 'Information not available' %}
+                                                    <span class="badge bg-warning text-dark fs-6">{{ result.next_hearing }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">{{ result.next_hearing }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr data-aos="fade-right" data-aos-delay="700">
+                                            <th class="text-primary">
+                                                <i class="fas fa-file-pdf me-2"></i>Latest Order
+                                            </th>
+                                            <td>
+                                                {% if result.latest_order and result.latest_order.pdf_url != '#' %}
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="fw-semibold me-3">{{ result.latest_order.date }}</span>
+                                                        <a href="{{ url_for('main.download_pdf', pdf_url=result.latest_order.pdf_url) }}" 
+                                                           class="btn btn-sm btn-outline-primary" target="_blank">
+                                                            <i class="fas fa-download me-1"></i>Download PDF
+                                                        </a>
+                                                        <a href="{{ result.latest_order.pdf_url }}" 
+                                                           class="btn btn-sm btn-outline-secondary" target="_blank">
+                                                            <i class="fas fa-external-link-alt me-1"></i>View Online
+                                                        </a>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="fw-semibold me-3">{{ result.latest_order.date }}</span>
+                                                        <span class="badge bg-info text-white">
+                                                            <i class="fas fa-info-circle me-1"></i>Demo Data
+                                                        </span>
+                                                        <span class="text-muted">PDF not available in demo mode</span>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <!-- Case Summary Card -->
+                            <div class="card bg-light h-100" data-aos="fade-left" data-aos-delay="400">
+                                <div class="card-header bg-gradient-info text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>Case Summary
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <strong>Status:</strong>
+                                        {% if result.next_hearing and result.next_hearing != 'Information not available' %}
+                                            <span class="badge bg-warning text-dark">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Unknown</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Documents:</strong>
+                                        {% if result.latest_order and result.latest_order.pdf_url != '#' %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Demo Mode</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        <strong>Source:</strong>
+                                        <span class="badge bg-info">Delhi High Court</span>
+                                    </div>
+                                    {% if result.latest_order and result.latest_order.pdf_url == '#' %}
+                                    <div class="alert alert-info alert-sm">
+                                        <small>
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            This is demo data. In production, real PDFs would be available.
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Actions -->
+                            <div class="card mt-3" data-aos="fade-left" data-aos-delay="500">
+                                <div class="card-header bg-gradient-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-tools me-2"></i>Quick Actions
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                                            <i class="fas fa-search me-2"></i>New Search
+                                        </a>
+                                        <a href="{{ url_for('main.query_history') }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-history me-2"></i>View History
+                                        </a>
+                                        <button class="btn btn-outline-info" onclick="window.print()">
+                                            <i class="fas fa-print me-2"></i>Print Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Analysis Section -->
+            {% if ai_analysis %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card border-primary mb-4" data-aos="fade-up" data-aos-delay="800">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-robot me-2"></i>AI Case Analysis
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Case Insights -->
+                                <div class="col-md-6" data-aos="fade-right" data-aos-delay="900">
+                                    <h5 class="text-primary mb-3">
+                                        <i class="fas fa-lightbulb me-2"></i>Key Insights
+                                    </h5>
+                                    <div class="insights-container">
+                                        {% for insight in ai_analysis.case_analysis.insights[:5] %}
+                                        <div class="insight-item" data-aos="fade-right" data-aos-delay="{{ 1000 + loop.index * 100 }}">
+                                            <div class="insight-card">
+                                                <i class="fas fa-arrow-right text-primary me-2"></i>
+                                                {{ insight }}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <!-- AI Recommendations -->
+                                <div class="col-md-6" data-aos="fade-left" data-aos-delay="900">
+                                    <h5 class="text-success mb-3">
+                                        <i class="fas fa-clipboard-list me-2"></i>AI Recommendations
+                                    </h5>
+                                    <div class="recommendations-container">
+                                        {% for rec in ai_analysis.case_analysis.recommendations[:5] %}
+                                        <div class="recommendation-item" data-aos="fade-left" data-aos-delay="{{ 1000 + loop.index * 100 }}">
+                                            <div class="recommendation-card">
+                                                <i class="fas fa-check text-success me-2"></i>
+                                                {{ rec }}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Case Timeline Analysis -->
+                            {% if ai_analysis.case_analysis.case_age.status != 'Unknown' %}
+                            <div class="row mt-4">
+                                <div class="col-md-6" data-aos="fade-up" data-aos-delay="1200">
+                                    <h6 class="text-info mb-3">
+                                        <i class="fas fa-clock me-2"></i>Case Timeline
+                                    </h6>
+                                    <div class="timeline-card">
+                                        <div class="timeline-item">
+                                            <strong>Status:</strong> 
+                                            <span class="badge bg-info">{{ ai_analysis.case_analysis.case_age.status }}</span>
+                                        </div>
+                                        <div class="timeline-item">
+                                            <strong>Age:</strong> 
+                                            {% if ai_analysis.case_analysis.case_age.age_years != 'Unknown' %}
+                                                <span class="fw-semibold">{{ ai_analysis.case_analysis.case_age.age_years }} years</span>
+                                            {% else %}
+                                                <span class="text-muted">Unknown</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="timeline-item">
+                                            <small class="text-muted">{{ ai_analysis.case_analysis.case_age.description }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if ai_analysis.case_analysis.hearing_analysis.status != 'Unknown' %}
+                                <div class="col-md-6" data-aos="fade-up" data-aos-delay="1300">
+                                    <h6 class="text-warning mb-3">
+                                        <i class="fas fa-calendar-alt me-2"></i>Next Hearing
+                                    </h6>
+                                    <div class="hearing-card">
+                                        <div class="hearing-item">
+                                            <strong>Status:</strong> 
+                                            <span class="badge bg-{{ 'danger' if ai_analysis.case_analysis.hearing_analysis.urgency == 'High' else 'warning' if ai_analysis.case_analysis.hearing_analysis.urgency == 'Medium' else 'info' }}">
+                                                {{ ai_analysis.case_analysis.hearing_analysis.status }}
+                                            </span>
+                                        </div>
+                                        <div class="hearing-item">
+                                            <strong>Urgency:</strong> 
+                                            <span class="fw-semibold">{{ ai_analysis.case_analysis.hearing_analysis.urgency }}</span>
+                                        </div>
+                                        <div class="hearing-item">
+                                            <small class="text-muted">{{ ai_analysis.case_analysis.hearing_analysis.description }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat Section -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card border-success" data-aos="fade-up" data-aos-delay="1400">
+                        <div class="card-header bg-gradient-success text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-comments me-2"></i>Ask AI About This Case
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="aiQuestion" class="form-label">
+                                            <i class="fas fa-question-circle me-2"></i>Ask a question about this case:
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="aiQuestion" 
+                                                   placeholder="e.g., What type of case is this? How long has it been pending? What should I do next?">
+                                            <button class="btn btn-success" type="button" onclick="askAI()">
+                                                <i class="fas fa-paper-plane me-1"></i>Ask AI
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="aiResponse" class="d-none">
+                                        <div class="ai-response-card">
+                                            <h6 class="text-white mb-2">
+                                                <i class="fas fa-robot me-2"></i>AI Response:
+                                            </h6>
+                                            <div id="aiAnswer" class="ai-answer-text"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-success mb-3">
+                                        <i class="fas fa-lightbulb me-2"></i>Suggested Questions:
+                                    </h6>
+                                    <div class="suggested-questions">
+                                        <button type="button" class="btn btn-outline-success btn-sm mb-2 w-100" 
+                                                onclick="askSuggestedQuestion('What type of case is this?')">
+                                            <i class="fas fa-question-circle me-1"></i>
+                                            What type of case is this?
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success btn-sm mb-2 w-100" 
+                                                onclick="askSuggestedQuestion('How long has this case been pending?')">
+                                            <i class="fas fa-clock me-1"></i>
+                                            How long has this case been pending?
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success btn-sm mb-2 w-100" 
+                                                onclick="askSuggestedQuestion('What should I do next?')">
+                                            <i class="fas fa-arrow-right me-1"></i>
+                                            What should I do next?
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success btn-sm mb-2 w-100" 
+                                                onclick="askSuggestedQuestion('What are the legal implications?')">
+                                            <i class="fas fa-balance-scale me-1"></i>
+                                            What are the legal implications?
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <!-- No Results -->
+            <div class="text-center" data-aos="fade-up">
+                <div class="no-results-container">
+                    <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3 float"></i>
+                    <h3 class="text-white">No Results Found</h3>
+                    <p class="text-white-50">No case details were found with the provided information.</p>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search me-2"></i>Try Another Search
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Enhanced CSS for Results Page -->
+<style>
+.success-animation-container {
+    animation: successPulse 1s ease-out;
+}
+
+.insight-item, .recommendation-item {
+    margin-bottom: 1rem;
+}
+
+.insight-card, .recommendation-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 4px solid var(--primary-color);
+    transition: var(--transition);
+    backdrop-filter: blur(10px);
+}
+
+.insight-card:hover, .recommendation-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-card, .hearing-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border-left: 4px solid var(--info-color);
+    backdrop-filter: blur(10px);
+}
+
+.timeline-item, .hearing-item {
+    margin-bottom: 0.5rem;
+}
+
+.timeline-item:last-child, .hearing-item:last-child {
+    margin-bottom: 0;
+}
+
+.ai-response-card {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    backdrop-filter: blur(10px);
+}
+
+.ai-answer-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.suggested-questions .btn {
+    text-align: left;
+    transition: var(--transition);
+}
+
+.suggested-questions .btn:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.no-results-container {
+    padding: 3rem 0;
+}
+
+/* Enhanced animations */
+@keyframes successPulse {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Loading animation for AI responses */
+.ai-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Enhanced table styling */
+.table th {
+    background: linear-gradient(135deg, var(--primary-color), #34495e);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-color: #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: scale(1.01);
+    transition: var(--transition);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .insight-card, .recommendation-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-card, .hearing-card {
+        margin-bottom: 1rem;
+    }
+    
+    .suggested-questions .btn {
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<!-- Enhanced JavaScript for AI Chat -->
+<script>
+const caseData = {{ result|tojson if result else '{}' }};
+
+function askAI() {
+    const question = document.getElementById('aiQuestion').value.trim();
+    if (!question) {
+        showErrorAnimation(document.getElementById('aiQuestion'));
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('aiResponse').classList.remove('d-none');
+    document.getElementById('aiAnswer').innerHTML = '<span class="ai-loading me-2"></span>AI is thinking...';
+    
+    fetch('/api/ask', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question: question,
+            case_data: caseData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById('aiAnswer').innerHTML = `<span class="text-danger">Error: ${data.error}</span>`;
+        } else {
+            document.getElementById('aiAnswer').innerHTML = data.answer;
+            showSuccessAnimation(document.getElementById('aiResponse'));
+        }
+    })
+    .catch(error => {
+        document.getElementById('aiAnswer').innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
+    });
+}
+
+function askSuggestedQuestion(question) {
+    document.getElementById('aiQuestion').value = question;
+    askAI();
+}
+
+// Allow Enter key to submit
+document.getElementById('aiQuestion').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        askAI();
+    }
+});
+
+// Add animations to insight and recommendation cards
+document.addEventListener('DOMContentLoaded', function() {
+    const insightCards = document.querySelectorAll('.insight-card, .recommendation-card');
+    insightCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Add hover effects to timeline and hearing cards
+    const timelineCards = document.querySelectorAll('.timeline-card, .hearing-card');
+    timelineCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+</script>
+
+<!-- Print Styles -->
+<style media="print">
+    .navbar, .footer, .btn, .card-header {
+        display: none !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .table th {
+        background-color: #f8f9fa !important;
+        color: #000 !important;
+    }
+    .ai-response-card {
+        background: #f8f9fa !important;
+        color: #000 !important;
+    }
+</style>
+{% endblock %}
