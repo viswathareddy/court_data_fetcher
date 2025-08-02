@@ -353,4 +353,4 @@ For issues and questions:
 
 ---
 
-**Built with ❤️ using Flask, Bootstrap, and AI**
+**Built with ❤️ using Flask, Bootstrap**
